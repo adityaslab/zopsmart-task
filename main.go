@@ -1,14 +1,19 @@
 package main
 
-import "gofr.dev/pkg/gofr"
+import (
+	"github.com/adityaslab/zopsmart-task/handler"
+	"gofr.dev/pkg/gofr"
+)
 
-func main() {
-    app := gofr.New()
-
-    app.GET("/greet", func(ctx *gofr.Context) (interface{}, error) {
-        return "Greetings!", nil
-    })
-
-    app.Start()
+type Car struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
+func main() {
+	app := gofr.New()
+
+	app.GET("/getAllTrains", handler.GetAllTrains)
+
+	app.Start()
+}
