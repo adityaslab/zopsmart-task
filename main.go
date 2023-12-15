@@ -15,5 +15,11 @@ func main() {
 
 	app.GET("/getAllTrains", handler.GetAllTrains)
 
+	app.POST("/addNewTrain", handler.AddNewTrain)
+
+	app.PUT("/updateTrainByNumber/{n}", handler.UpdateTrainByNumber)
+
+	app.POST("/createNPlatforms/{n}", handler.CreateNPlatforms)
+
 	app.Start()
 }
