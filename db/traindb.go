@@ -54,7 +54,10 @@ func AddNewTrain(ctx *gofr.Context, t models.Train) (models.Train, error) {
 
 	//check if this train number(n) already exist in db, if it does throw error
 	if validateTrainNumberInTrainDb(ctx, t.TrainNumber) {
-		return models.Train{}, errors.EntityAlreadyExists{}
+		return models.Train{}, &errors.Response{
+			Reason: "Entity already exists",
+		}
+		//problem with returning errors.EntityAlreadyExists{} here check later
 	}
 
 	_, err := ctx.DB().ExecContext(ctx,
@@ -114,13 +117,13 @@ func UpdateTrainStatusByNumber(ctx *gofr.Context, trainno int, status string) {
 
 // returns true if the trainNumber already exists in the table
 func validateTrainNumberInTrainDb(ctx *gofr.Context, trainNumber int) bool {
+	var res models.Train
+	ctx.DB().QueryRowContext(ctx,
+		"SELECT * FROM trains WHERE number = ?", trainNumber).Scan(&res.TrainNumber, &res.Name, &res.Status)
 
-	_, err := ctx.DB().ExecContext(ctx,
-		"INSERT INTO trains (number, name, status) VALUES (?, ?, ?)", trainNumber, "SOME_NAME", "ARIVING")
-
-	if err != nil {
+	if res.TrainNumber == trainNumber {
 		return true
+	} else {
+		return false
 	}
-	DeleteTrainByNumber(ctx, trainNumber)
-	return false
 }

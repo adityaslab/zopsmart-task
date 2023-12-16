@@ -36,7 +36,7 @@ func GetTrainByNumber(ctx *gofr.Context) (interface{}, error) {
 
 func AddNewTrain(ctx *gofr.Context) (interface{}, error) {
 	var t models.Train
-	if err := ctx.Bind(&t); err != nil {
+	if err := ctx.BindStrict(&t); err != nil {
 		return nil, err
 	}
 

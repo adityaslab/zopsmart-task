@@ -59,14 +59,14 @@ func GetAllPlatformDetails(ctx *gofr.Context) (interface{}, error) {
 	for _, p := range platforms {
 		var train models.Train
 		checkIfPlatformFree := false
-		if p.TrainNumber == 0 {
+		if p.TrainNumber == -1 {
 			checkIfPlatformFree = true
 		}
 
 		train, err = db.GetTrainByNumber(ctx, p.TrainNumber)
 		var trainname string
 
-		//we will hit this error only if train number is 0 meaning the platform is free
+		//we will hit this error only if train number is -1 meaning the platform is free
 		if err != nil {
 			trainname = ""
 		} else {
@@ -89,14 +89,14 @@ func GetPlatformDetailsByPlatformNo(ctx *gofr.Context, plaformNo int) (interface
 	p, err := db.GetPlatformDetailsByPlatformNo(ctx, plaformNo)
 	var train models.Train
 	checkIfPlatformFree := false
-	if p.TrainNumber == 0 {
+	if p.TrainNumber == -1 {
 		checkIfPlatformFree = true
 	}
 
 	train, err = db.GetTrainByNumber(ctx, p.TrainNumber)
 	var trainname string
 
-	//we will hit this error only if train number is 0 meaning the platform is free
+	//we will hit this error only if train number is -1 meaning the platform is free
 	if err != nil {
 		trainname = ""
 	} else {

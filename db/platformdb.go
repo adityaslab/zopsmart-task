@@ -49,7 +49,7 @@ func GetPlatformDetailsByPlatformNo(ctx *gofr.Context, plaformNo int) (models.Pl
 func CreateNPlatforms(ctx *gofr.Context, n int) error {
 
 	for i := 1; i <= n; i++ {
-		_, err := ctx.DB().ExecContext(ctx, "INSERT INTO platforms (number, train) VALUES (?, ?)", i, 0)
+		_, err := ctx.DB().ExecContext(ctx, "INSERT INTO platforms (number, train) VALUES (?, ?)", i, -1)
 		if err != nil {
 			return errors.DB{Err: err}
 		}
@@ -70,15 +70,15 @@ func TrainArrival(ctx *gofr.Context, p models.Platform) error {
 		return &errors.Response{Reason: "Invalid platform number"}
 	}
 
-	//check if platform is empty
-	platform, err := GetPlatformDetailsByPlatformNo(ctx, p.PlatformNumber)
-	if platform.PlatformNumber != 0 {
-		return &errors.Response{Reason: "There is already another train on the platform"}
-	}
-
 	//put a check if train is valid
 	if !validateTrainNumberInTrainDb(ctx, p.TrainNumber) {
 		return &errors.Response{Reason: "Invalid train number"}
+	}
+
+	//check if platform is empty
+	platform, err := GetPlatformDetailsByPlatformNo(ctx, p.PlatformNumber)
+	if platform.TrainNumber != -1 {
+		return &errors.Response{Reason: "There is already another train on the platform"}
 	}
 
 	//check if the train's status is valid
@@ -98,9 +98,6 @@ func TrainArrival(ctx *gofr.Context, p models.Platform) error {
 }
 
 func TrainDeparture(ctx *gofr.Context, p models.Platform) error {
-
-	//put a check if train is valid and status is arrived
-	//make it depart by replacing train no with 0 on platform table
 
 	//check if the platform exist
 	if !validatePlatformNumber(ctx, p.PlatformNumber) {
@@ -125,7 +122,7 @@ func TrainDeparture(ctx *gofr.Context, p models.Platform) error {
 	// 	message := fmt.Sprintf("Trains current status: %v", train.Status)
 	// 	return &errors.Response{Reason: message}
 	// }
-	_, err = ctx.DB().ExecContext(ctx, "UPDATE  platforms set train = ? WHERE number = ?", 0, p.PlatformNumber)
+	_, err = ctx.DB().ExecContext(ctx, "UPDATE  platforms set train = ? WHERE number = ?", -1, p.PlatformNumber)
 
 	if err != nil {
 		return errors.DB{Err: err}
@@ -135,18 +132,17 @@ func TrainDeparture(ctx *gofr.Context, p models.Platform) error {
 }
 
 func FindTrainOnStation(ctx *gofr.Context, trainNumber int) (int, error) {
-	validateTrainNo := false
-	if validateTrainNumberInTrainDb(ctx, trainNumber) {
-		validateTrainNo = true
+	validationFlag := validateTrainNumberInTrainDb(ctx, trainNumber)
+	if !validationFlag {
+		return -1, &errors.Response{Reason: "Invalid train number"}
 	}
 	var res models.Platform
 	err := ctx.DB().QueryRowContext(ctx,
 		"SELECT * FROM platforms WHERE train = ?", trainNumber).Scan(&res.PlatformNumber, &res.TrainNumber)
 
 	if err != nil {
-		//hits this case if the train number is valid but not present on any platform
-		if validateTrainNo {
-			return 0, nil
+		if validationFlag {
+			return -1, nil
 		} else {
 			return -1, errors.DB{Err: err}
 		}
@@ -157,17 +153,13 @@ func FindTrainOnStation(ctx *gofr.Context, trainNumber int) (int, error) {
 // returns true if the platform number already exists
 func validatePlatformNumber(ctx *gofr.Context, platformNo int) bool {
 
-	_, err := ctx.DB().ExecContext(ctx,
-		"INSERT INTO platforms (number, train) VALUES (?, ?)", platformNo, 123)
+	var res models.Platform
+	ctx.DB().QueryRowContext(ctx,
+		"SELECT * FROM platforms WHERE number = ?", platformNo).Scan(&res.PlatformNumber, &res.TrainNumber)
 
-	if err != nil {
+	if res.PlatformNumber == platformNo {
 		return true
+	} else {
+		return false
 	}
-	deletePlatformNumber(ctx, platformNo)
-	return false
-}
-
-// for validation purpose
-func deletePlatformNumber(ctx *gofr.Context, platformNo int) {
-	ctx.DB().ExecContext(ctx, "DELETE FROM platform WHERE number = ?", platformNo)
 }
