@@ -1,11 +1,23 @@
 package handler
 
 import (
+	"fmt"
 	"strconv"
 
+	"github.com/adityaslab/zopsmart-task/db"
 	"github.com/adityaslab/zopsmart-task/models"
 	"gofr.dev/pkg/gofr"
 )
+
+type stringResp struct {
+	Message string
+}
+
+type platformResp struct {
+	PlatformNumber int
+	IsFree         bool
+	TrainName      string
+}
 
 func TrainArrival(ctx *gofr.Context) (interface{}, error) {
 
@@ -13,15 +25,31 @@ func TrainArrival(ctx *gofr.Context) (interface{}, error) {
 	if err := ctx.Bind(&p); err != nil {
 		return nil, err
 	}
-	//put a check if the platform exist and is empty
-	//put a check if train is valid
-	_, err := ctx.DB().ExecContext(ctx, "UPDATE platforms SET train = ? WHERE number = ?", p.Train, p.Number)
+
+	err := db.TrainArrival(ctx, p)
+
 	if err != nil {
+		return stringResp{Message: fmt.
+			Sprintf("Train couldn't arrive at platform number %d!", p.PlatformNumber)}, err
+	}
+
+	return stringResp{Message: fmt.Sprintf("Train arrived at platform number %d", p.PlatformNumber)}, nil
+}
+
+func TrainDeparture(ctx *gofr.Context) (interface{}, error) {
+
+	var p models.Platform
+	if err := ctx.Bind(&p); err != nil {
 		return nil, err
 	}
-	UpdateTrainStatusByNumber(ctx, p.Train, "ARRIVED")
 
-	return nil, err
+	err := db.TrainDeparture(ctx, p)
+
+	if err != nil {
+		return stringResp{Message: "Task failed due to error"}, err
+	}
+
+	return stringResp{Message: "Train departed from the platform"}, nil
 }
 
 func GetAllPlatformStatus(ctx *gofr.Context) (interface{}, error) {
@@ -38,37 +66,43 @@ func GetAllPlatformStatus(ctx *gofr.Context) (interface{}, error) {
 
 	for rows.Next() {
 		var p models.Platform
-		if err := rows.Scan(&p.Number, &p.Train); err != nil {
+		if err := rows.Scan(&p.PlatformNumber, &p.TrainNumber); err != nil {
 			return nil, err
 		}
 
 		platforms = append(platforms, p)
 	}
+	resp := make([]platformResp, 0)
+	for _, p := range platforms {
+		var train models.Train
+		checkIfPlatformFree := false
+		if p.TrainNumber == 0 {
+			checkIfPlatformFree = true
+		}
 
-	return platforms, nil
+		train, err = db.GetTrainByNumber(ctx, p.TrainNumber)
+		var trainname string
+
+		//we will hit this error only if train number is 0 meaning the platform is free
+		if err != nil {
+			trainname = ""
+		} else {
+			trainname = train.Name
+		}
+
+		r := platformResp{
+			PlatformNumber: p.PlatformNumber,
+			IsFree:         checkIfPlatformFree,
+			TrainName:      trainname,
+		}
+		resp = append(resp, r)
+	}
+
+	return resp, nil
 }
 
 // func GetPlatformStatus(ctx *gofr.Context, platformNo int) (interface{}, error) {
 // }
-
-func TrainDeparture(ctx *gofr.Context) (interface{}, error) {
-
-	var p models.Platform
-	if err := ctx.Bind(&p); err != nil {
-		return nil, err
-	}
-	//put a check if train is valid and status is arrived
-	//make it depart by replacing train no with 0 on platform table
-
-	_, err := ctx.DB().ExecContext(ctx, "UPDATE  platforms set train = ? WHERE number = ?", 0, p.Number)
-
-	if err != nil {
-		return nil, err
-	}
-	UpdateTrainStatusByNumber(ctx, p.Train, "DEPARTED")
-
-	return nil, err
-}
 
 func CreateNPlatforms(ctx *gofr.Context) (interface{}, error) {
 	num := ctx.PathParam("n")
@@ -77,19 +111,14 @@ func CreateNPlatforms(ctx *gofr.Context) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	DeleteAllPlatforms(ctx)
-	for i := 1; i <= n; i++ {
-		_, err := ctx.DB().ExecContext(ctx, "INSERT INTO platforms (number, train) VALUES (?, ?)", i, 0)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return nil, err
+	db.DeleteAllPlatforms(ctx)
+	db.CreateNPlatforms(ctx, n)
+
+	return stringResp{Message: "Platforms created successfully!"}, nil
 }
 
 func DeleteAllPlatforms(ctx *gofr.Context) (interface{}, error) {
 
-	_, err := ctx.DB().ExecContext(ctx, "DELETE FROM platforms")
-	return nil, err
-
+	db.DeleteAllPlatforms(ctx)
+	return nil, nil
 }

@@ -23,9 +23,11 @@ func main() {
 
 	app.POST("/trainArrival", handler.TrainArrival)
 
-	app.DELETE("/trainDeparture", handler.TrainDeparture)
+	app.PUT("/trainDeparture", handler.TrainDeparture)
 
 	app.DELETE("/deleteTrainByNumber/{n}", handler.DeleteTrainByNumber)
+
+	app.GET("/getAllPlatformDetails", handler.GetAllPlatformStatus)
 
 	app.POST("/createNPlatforms/{n}", handler.CreateNPlatforms)
 
