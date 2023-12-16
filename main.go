@@ -25,9 +25,11 @@ func main() {
 
 	app.PUT("/trainDeparture", handler.TrainDeparture)
 
+	app.GET("/findTrainOnStationByTrainNumber/{n}", handler.FindTrainOnStation)
+
 	app.DELETE("/deleteTrainByNumber/{n}", handler.DeleteTrainByNumber)
 
-	app.GET("/getAllPlatformDetails", handler.GetAllPlatformStatus)
+	app.GET("/getAllPlatformDetails", handler.GetAllPlatformDetails)
 
 	app.POST("/createNPlatforms/{n}", handler.CreateNPlatforms)
 

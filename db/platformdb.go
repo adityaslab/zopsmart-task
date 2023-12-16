@@ -6,7 +6,7 @@ import (
 	"gofr.dev/pkg/gofr"
 )
 
-func GetAllPlatformStatus(ctx *gofr.Context) ([]models.Platform, error) {
+func GetAllPlatformDetails(ctx *gofr.Context) ([]models.Platform, error) {
 
 	rows, err := ctx.DB().QueryContext(ctx, "SELECT * FROM platforms")
 
@@ -26,8 +26,19 @@ func GetAllPlatformStatus(ctx *gofr.Context) ([]models.Platform, error) {
 
 		platforms = append(platforms, p)
 	}
-
 	return platforms, nil
+}
+
+func GetAllPlatformDetailsByPlatformNo(ctx *gofr.Context, plaformNo int) (models.Platform, error) {
+
+	var res models.Platform
+	err := ctx.DB().QueryRowContext(ctx,
+		"SELECT * FROM platforms WHERE number = ?", plaformNo).Scan(&res.PlatformNumber, &res.TrainNumber)
+
+	if err != nil {
+		return models.Platform{}, errors.DB{Err: err}
+	}
+	return res, err
 }
 
 func CreateNPlatforms(ctx *gofr.Context, n int) error {
@@ -73,3 +84,16 @@ func TrainDeparture(ctx *gofr.Context, p models.Platform) error {
 	UpdateTrainStatusByNumber(ctx, p.TrainNumber, "DEPARTED")
 	return nil
 }
+
+func FindTrainOnStation(ctx *gofr.Context, trainNumber int) (int, error) {
+	var res models.Platform
+	err := ctx.DB().QueryRowContext(ctx,
+		"SELECT * FROM platforms WHERE train = ?", trainNumber).Scan(&res.PlatformNumber, &res.TrainNumber)
+
+	if err != nil {
+		return -1, errors.DB{Err: err}
+	}
+	return res.PlatformNumber, nil
+}
+
+// func validatePlatformNumber(ctx *gofr.Context, platformNo int)

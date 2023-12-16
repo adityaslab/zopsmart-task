@@ -52,26 +52,9 @@ func TrainDeparture(ctx *gofr.Context) (interface{}, error) {
 	return stringResp{Message: "Train departed from the platform"}, nil
 }
 
-func GetAllPlatformStatus(ctx *gofr.Context) (interface{}, error) {
+func GetAllPlatformDetails(ctx *gofr.Context) (interface{}, error) {
 
-	rows, err := ctx.DB().QueryContext(ctx, "SELECT * FROM platforms")
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	platforms := make([]models.Platform, 0)
-
-	for rows.Next() {
-		var p models.Platform
-		if err := rows.Scan(&p.PlatformNumber, &p.TrainNumber); err != nil {
-			return nil, err
-		}
-
-		platforms = append(platforms, p)
-	}
+	platforms, err := db.GetAllPlatformDetails(ctx)
 	resp := make([]platformResp, 0)
 	for _, p := range platforms {
 		var train models.Train
@@ -101,8 +84,53 @@ func GetAllPlatformStatus(ctx *gofr.Context) (interface{}, error) {
 	return resp, nil
 }
 
-// func GetPlatformStatus(ctx *gofr.Context, platformNo int) (interface{}, error) {
-// }
+func GetPlatformDetailsByPlatformNo(ctx *gofr.Context, plaformNo int) (interface{}, error) {
+
+	p, err := db.GetAllPlatformDetailsByPlatformNo(ctx, plaformNo)
+	var train models.Train
+	checkIfPlatformFree := false
+	if p.TrainNumber == 0 {
+		checkIfPlatformFree = true
+	}
+
+	train, err = db.GetTrainByNumber(ctx, p.TrainNumber)
+	var trainname string
+
+	//we will hit this error only if train number is 0 meaning the platform is free
+	if err != nil {
+		trainname = ""
+	} else {
+		trainname = train.Name
+	}
+
+	r := platformResp{
+		PlatformNumber: p.PlatformNumber,
+		IsFree:         checkIfPlatformFree,
+		TrainName:      trainname,
+	}
+
+	return r, nil
+}
+
+func FindTrainOnStation(ctx *gofr.Context) (interface{}, error) {
+	num := ctx.PathParam("n")
+	trainNumber, err := strconv.Atoi(num)
+	//not a number
+	if err != nil {
+		return nil, err
+	}
+	platform, err := db.FindTrainOnStation(ctx, trainNumber)
+	if err != nil {
+		return nil, err
+	}
+	var msg string
+	if platform != 0 {
+		msg = fmt.Sprintf("The train is on platform %d", platform)
+	} else {
+		msg = fmt.Sprintf("The train is not on the station")
+	}
+	return stringResp{Message: msg}, nil
+}
 
 func CreateNPlatforms(ctx *gofr.Context) (interface{}, error) {
 	num := ctx.PathParam("n")
