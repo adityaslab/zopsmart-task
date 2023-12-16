@@ -86,7 +86,7 @@ func GetAllPlatformDetails(ctx *gofr.Context) (interface{}, error) {
 
 func GetPlatformDetailsByPlatformNo(ctx *gofr.Context, plaformNo int) (interface{}, error) {
 
-	p, err := db.GetAllPlatformDetailsByPlatformNo(ctx, plaformNo)
+	p, err := db.GetPlatformDetailsByPlatformNo(ctx, plaformNo)
 	var train models.Train
 	checkIfPlatformFree := false
 	if p.TrainNumber == 0 {
@@ -124,7 +124,7 @@ func FindTrainOnStation(ctx *gofr.Context) (interface{}, error) {
 		return nil, err
 	}
 	var msg string
-	if platform != 0 {
+	if platform > 0 {
 		msg = fmt.Sprintf("The train is on platform %d", platform)
 	} else {
 		msg = fmt.Sprintf("The train is not on the station")
