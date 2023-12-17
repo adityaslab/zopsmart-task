@@ -1,0 +1,260 @@
+{
+	"info": {
+		"_postman_id": "7cbef09a-dcd7-4410-946b-81a7e7faf966",
+		"name": "Railgadi Management System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20280246"
+	},
+	"item": [
+		{
+			"name": "getAllTrains",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/getAllTrains",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"getAllTrains"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addNewTrain",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"train_number\":12200,\n    \"name\":\"CDG LKO EXP\",\n    \"status\":\"ARRIVING\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/addNewTrain",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"addNewTrain"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateTrainByNumber{n}",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"number\":12221,\n    \"name\":\"EXP123\",\n    \"status\":\"DEPARTED\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/updateTrainByNumber/12231",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"updateTrainByNumber",
+						"12231"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createNPlatforms/{n}",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/createNPlatforms/7",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"createNPlatforms",
+						"7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteTrainByNumber/{n}",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/deleteTrainByNumber/12231",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"deleteTrainByNumber",
+						"12231"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteAllPlatforms",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/deleteAllPlatforms",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"deleteAllPlatforms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "trainArrival",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"platform_number\" : 1,\n    \"train_number\" : 12232\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/trainArrival",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"trainArrival"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "trainDeparture",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"platform_number\" : 1,\n    \"train_number\" : 12232\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/trainDeparture",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"trainDeparture"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getTrainByNumber/{n}",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/getTrainByNumber/12232123",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"getTrainByNumber",
+						"12232123"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllPlatformDetails",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/getAllPlatformDetails",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"getAllPlatformDetails"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "findTrainOnStationByTrainNumber/{n}",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/findTrainOnStationByTrainNumber/12232",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"findTrainOnStationByTrainNumber",
+						"12232"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
