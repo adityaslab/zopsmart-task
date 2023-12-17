@@ -116,12 +116,6 @@ func TrainDeparture(ctx *gofr.Context, p models.Platform) error {
 		return &errors.Response{Reason: msg}
 	}
 
-	//check if the train's status is valid
-	// train, err := GetTrainByNumber(ctx, p.TrainNumber)
-	// if strings.ToLower(train.Status) != "arrived" {
-	// 	message := fmt.Sprintf("Trains current status: %v", train.Status)
-	// 	return &errors.Response{Reason: message}
-	// }
 	_, err = ctx.DB().ExecContext(ctx, "UPDATE  platforms set train_number = ? WHERE platform_number = ?", -1, p.PlatformNumber)
 
 	if err != nil {

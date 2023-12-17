@@ -119,24 +119,3 @@ func TestFindTrainByNumber(t *testing.T) {
 	tres, err := GetTrainByNumber(ctx, tr.TrainNumber)
 	assert.NotNil(t, tres)
 }
-
-// func TestGetAllTrains(t *testing.T) {
-// 	var ctx *gofr.Context = gofr.NewContext(nil, nil, gofr.New())
-// 	_, mock, err := sqlmock.New()
-
-// 	if err != nil {
-// 		ctx.Logger.Error("an error '%s' was not expected when opening a stub database connection", err)
-// 	}
-
-// 	query := "SELECT * FROM trains"
-
-// 	rows := sqlmock.NewRows([]string{"number", "name", "status"}).
-// 		AddRow(tr.TrainNumber, tr.Name, tr.Status)
-
-// 	mock.ExpectQuery(query).WillReturnRows(rows)
-
-// 	resp, err := GetAllTrains(ctx)
-// 	fmt.Print("we are here")
-// 	assert.NotNil(t, resp)
-// 	assert.NoError(t, err)
-// }
