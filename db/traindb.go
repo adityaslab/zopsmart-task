@@ -42,7 +42,7 @@ func GetTrainByNumber(ctx *gofr.Context, trainNo int) (models.Train, error) {
 
 	var res models.Train
 	err := ctx.DB().QueryRowContext(ctx,
-		"SELECT * FROM trains WHERE number = ?", trainNo).Scan(&res.TrainNumber, &res.Name, &res.Status)
+		"SELECT * FROM trains WHERE train_number = ?", trainNo).Scan(&res.TrainNumber, &res.Name, &res.Status)
 
 	if err != nil {
 		return models.Train{}, errors.DB{Err: err}
@@ -61,7 +61,7 @@ func AddNewTrain(ctx *gofr.Context, t models.Train) (models.Train, error) {
 	}
 
 	_, err := ctx.DB().ExecContext(ctx,
-		"INSERT INTO trains (number, name, status) VALUES (?, ?, ?)", t.TrainNumber, t.Name, t.Status)
+		"INSERT INTO trains (train_number, name, status) VALUES (?, ?, ?)", t.TrainNumber, t.Name, t.Status)
 
 	if err != nil {
 		return models.Train{}, errors.DB{Err: err}
@@ -88,7 +88,7 @@ func UpdateTrainByNumber(ctx *gofr.Context, n int, t models.Train) (models.Train
 	}
 
 	_, err := ctx.DB().ExecContext(ctx,
-		"UPDATE trains SET name = ?, status = ? WHERE number = ?", t.Name, t.Status, n)
+		"UPDATE trains SET name = ?, status = ? WHERE train_number = ?", t.Name, t.Status, n)
 
 	if err != nil {
 		return models.Train{}, errors.DB{Err: err}
@@ -104,7 +104,7 @@ func UpdateTrainByNumber(ctx *gofr.Context, n int, t models.Train) (models.Train
 }
 
 func DeleteTrainByNumber(ctx *gofr.Context, trainNumber int) (interface{}, error) {
-	_, error := ctx.DB().ExecContext(ctx, "DELETE FROM trains WHERE number = ?", trainNumber)
+	_, error := ctx.DB().ExecContext(ctx, "DELETE FROM trains WHERE train_number = ?", trainNumber)
 	return nil, error
 }
 
@@ -112,14 +112,14 @@ func DeleteTrainByNumber(ctx *gofr.Context, trainNumber int) (interface{}, error
 // This is a helper function to be used internally and not exposed to the API
 func UpdateTrainStatusByNumber(ctx *gofr.Context, trainno int, status string) {
 	ctx.DB().ExecContext(ctx,
-		"UPDATE trains SET status = ? WHERE number = ?", status, trainno)
+		"UPDATE trains SET status = ? WHERE train_number = ?", status, trainno)
 }
 
 // returns true if the trainNumber already exists in the table
 func validateTrainNumberInTrainDb(ctx *gofr.Context, trainNumber int) bool {
 	var res models.Train
 	ctx.DB().QueryRowContext(ctx,
-		"SELECT * FROM trains WHERE number = ?", trainNumber).Scan(&res.TrainNumber, &res.Name, &res.Status)
+		"SELECT * FROM trains WHERE train_number = ?", trainNumber).Scan(&res.TrainNumber, &res.Name, &res.Status)
 
 	if res.TrainNumber == trainNumber {
 		return true

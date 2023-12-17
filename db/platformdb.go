@@ -38,7 +38,7 @@ func GetPlatformDetailsByPlatformNo(ctx *gofr.Context, plaformNo int) (models.Pl
 	}
 	var res models.Platform
 	err := ctx.DB().QueryRowContext(ctx,
-		"SELECT * FROM platforms WHERE number = ?", plaformNo).Scan(&res.PlatformNumber, &res.TrainNumber)
+		"SELECT * FROM platforms WHERE platform_number = ?", plaformNo).Scan(&res.PlatformNumber, &res.TrainNumber)
 
 	if err != nil {
 		return models.Platform{}, errors.DB{Err: err}
@@ -49,7 +49,7 @@ func GetPlatformDetailsByPlatformNo(ctx *gofr.Context, plaformNo int) (models.Pl
 func CreateNPlatforms(ctx *gofr.Context, n int) error {
 
 	for i := 1; i <= n; i++ {
-		_, err := ctx.DB().ExecContext(ctx, "INSERT INTO platforms (number, train) VALUES (?, ?)", i, -1)
+		_, err := ctx.DB().ExecContext(ctx, "INSERT INTO platforms (platform_number, train_number) VALUES (?, ?)", i, -1)
 		if err != nil {
 			return errors.DB{Err: err}
 		}
@@ -88,7 +88,7 @@ func TrainArrival(ctx *gofr.Context, p models.Platform) error {
 		return &errors.Response{Reason: message}
 	}
 
-	_, err = ctx.DB().ExecContext(ctx, "UPDATE platforms SET train = ? WHERE number = ?", p.TrainNumber, p.PlatformNumber)
+	_, err = ctx.DB().ExecContext(ctx, "UPDATE platforms SET train_number = ? WHERE platform_number = ?", p.TrainNumber, p.PlatformNumber)
 	if err != nil {
 		return errors.DB{Err: err}
 	}
@@ -122,7 +122,7 @@ func TrainDeparture(ctx *gofr.Context, p models.Platform) error {
 	// 	message := fmt.Sprintf("Trains current status: %v", train.Status)
 	// 	return &errors.Response{Reason: message}
 	// }
-	_, err = ctx.DB().ExecContext(ctx, "UPDATE  platforms set train = ? WHERE number = ?", -1, p.PlatformNumber)
+	_, err = ctx.DB().ExecContext(ctx, "UPDATE  platforms set train_number = ? WHERE platform_number = ?", -1, p.PlatformNumber)
 
 	if err != nil {
 		return errors.DB{Err: err}
@@ -138,7 +138,7 @@ func FindTrainOnStation(ctx *gofr.Context, trainNumber int) (int, error) {
 	}
 	var res models.Platform
 	err := ctx.DB().QueryRowContext(ctx,
-		"SELECT * FROM platforms WHERE train = ?", trainNumber).Scan(&res.PlatformNumber, &res.TrainNumber)
+		"SELECT * FROM platforms WHERE train_number = ?", trainNumber).Scan(&res.PlatformNumber, &res.TrainNumber)
 
 	if err != nil {
 		if validationFlag {
@@ -155,7 +155,7 @@ func validatePlatformNumber(ctx *gofr.Context, platformNo int) bool {
 
 	var res models.Platform
 	ctx.DB().QueryRowContext(ctx,
-		"SELECT * FROM platforms WHERE number = ?", platformNo).Scan(&res.PlatformNumber, &res.TrainNumber)
+		"SELECT * FROM platforms WHERE platform_number = ?", platformNo).Scan(&res.PlatformNumber, &res.TrainNumber)
 
 	if res.PlatformNumber == platformNo {
 		return true
