@@ -172,3 +172,10 @@ Below are the endpoints available in the API (all of them have hyperlink to jump
 - **Response:**
   ![image](https://github.com/adityaslab/zopsmart-task/assets/71747119/fd929b0b-7ded-4bba-b135-039d44e22033)
 
+## Entity diagram
+**Train**\
+![Screenshot_20231217_140636](https://github.com/adityaslab/zopsmart-task/assets/71747119/5e983edb-eda8-4f70-ac41-f68009c67514)
+
+**Platform**\
+
+![Screenshot_20231217_140609](https://github.com/adityaslab/zopsmart-task/assets/71747119/5b88fce8-fe67-4d09-bdab-eba2eb98de42)
