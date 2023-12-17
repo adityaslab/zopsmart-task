@@ -2,11 +2,8 @@
 
 ## Description
 
-This is a REST API made using GoFr framework.
+Railway management system API made using GoFr framework with MySQL as db.
 
-## Features
-
-- Add features
 
 ## API-Documentation
 
@@ -40,6 +37,9 @@ Below are the endpoints available in the API (all of them have hyperlink to jump
 - **Description:**
 
   - Get train details by train number.
+  - Validation for train number, ⚠*throws error* if:
+    - The train number cannot be parsed into int
+    - The train number is not in the table `trains`
 
 - **Response Body:**\
   ![Screenshot from 2023-12-17 02-24-59](https://github.com/adityaslab/zopsmart-task/assets/71747119/df4598f2-8739-44fb-ac06-0bd7c2b7daaf)
@@ -51,7 +51,9 @@ Below are the endpoints available in the API (all of them have hyperlink to jump
 - **Description:**
 
   - Add a new train.
-
+  - Validation for train number, ⚠*throws error* if:
+    - The new train number is already present in the table `trains`
+      
 - **Request Body:**\
   ![Screenshot from 2023-12-17 02-15-19](https://github.com/adityaslab/zopsmart-task/assets/71747119/3cbe18e1-b28a-4076-b921-4e835dc2864e)
 
@@ -64,6 +66,9 @@ Below are the endpoints available in the API (all of them have hyperlink to jump
 
 - **Description:**
   - Update details of a train.
+  - Validation for train number, ⚠*throws error* if:
+    - The train number cannot be parsed into int
+    - The train number is not in the table `trains`
 - **Request Body:**\
   ![Screenshot from 2023-12-17 02-28-07](https://github.com/adityaslab/zopsmart-task/assets/71747119/f74690db-879f-4478-9503-001bd362edd6)
 
@@ -77,7 +82,13 @@ Below are the endpoints available in the API (all of them have hyperlink to jump
 - **Description:**
 
   - Make a train arrive at a platform.
-
+  - Validation for train number, ⚠*throws error* if these conditions aren't met:
+    - The platform number is valid and is in the table `platforms`
+    - The train number is valid and is in the table `trains`
+    - The trains current status is *ARRIVING* and not *ARRIVED* or *DEPARTED*
+    - The plaform is empty
+  - After validation changes train's status to `ARRIVED` and platform's status not empty
+    
 - **Request Body:**\
   ![image](https://github.com/adityaslab/zopsmart-task/assets/71747119/6e1e4a3b-1f22-45b7-943d-7618bfd06255)
 
@@ -90,6 +101,11 @@ Below are the endpoints available in the API (all of them have hyperlink to jump
 - **Description:**
 
   - Make a train depart from a platform.
+  - Validation for train number, ⚠*throws error* if these conditions aren't met:
+    - The platform number is valid and is in the table `platforms`
+    - The train number is valid and is in the table `trains`
+    - The trains is actually standing on the platform it wants to depart from
+  - After Validation check changes trains status to *DEPARTED* and updates the platform status to be empty again
 
 - **Request Body:**\
   ![image](https://github.com/adityaslab/zopsmart-task/assets/71747119/1f7db8e5-80e3-4193-9086-a5dc4cab719a)
@@ -103,6 +119,11 @@ Below are the endpoints available in the API (all of them have hyperlink to jump
 - **Description:**
 
   - Locate the train's platform number(if it is on station).
+ 
+  - Validation for train number, ⚠*throws error* if:
+    - The train number cannot be parsed into int
+    - The train number is not in the table `trains`
+  - Returns the platform number or responds with *The train is not on the station*
 
 - **Response:**
   ![image](https://github.com/adityaslab/zopsmart-task/assets/71747119/415e3610-193e-418b-85ef-eea1e328b8ba)
@@ -122,7 +143,8 @@ Below are the endpoints available in the API (all of them have hyperlink to jump
 
 - **Description:**
 
-  - Get all Platforms and the name of train standing on them.
+  - Get all Platforms and the name of train standing on them
+  - Boolean `isFree` states that weather the plaform is free right now or not 
 
 - **Response:**
   ![image](https://github.com/adityaslab/zopsmart-task/assets/71747119/97884ed7-cc34-4be1-bf61-3a291c6959a7)
@@ -132,7 +154,10 @@ Below are the endpoints available in the API (all of them have hyperlink to jump
 
 - **Description:**
 
-  - Create n number of platforms.
+  - Create **n** number of platforms
+  - Deletes older platform along with their data before creating **n** new ones
+  - All the initialized platforms are empty
+  - Validation for n to be a integer value
 
 - **Response:**
   ![image](https://github.com/adityaslab/zopsmart-task/assets/71747119/0002afc7-1cc1-4c33-b990-d353b50e424f)
